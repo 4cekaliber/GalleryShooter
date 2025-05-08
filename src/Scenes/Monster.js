@@ -48,6 +48,9 @@ class Monster extends Phaser.Scene{
 
         this.load.bitmapFont("rocketSquare","KennyRocketSquare_0.png","KennyRocketSquare.fnt");
 
+        this.load.audio("explode","explosionCrunch_004.ogg");
+        this.load.audio("shot","laserLarge_001.ogg");
+
     }
 
     create(){
@@ -131,8 +134,10 @@ class Monster extends Phaser.Scene{
             if(this.fireCooldownCounter <0){
             this.my.sprite.projectile = this.my.sprite.bulletArr.push(this.add.sprite(this.my.sprite.plane.x,this.my.sprite.plane.y,"playerBullet"));
             this.fireCooldownCounter = this.fireCooldown;
-            }//this.my.sprite.projectile.angle = 90;
-
+            this.sound.play("shot",{
+                volume: 0.7
+            });
+            }
         });
 
         
@@ -191,13 +196,14 @@ class Monster extends Phaser.Scene{
         
         
     }
+
     update(){
         this.fireCooldownCounter--;
         this.homingCooldownCounter--;
         this.damageCooldownCounter--;
         this.laserDurationCounter--;
-        this.ranX = Phaser.Math.Between(280,301);
-        this.launchHoming = Phaser.Math.Between(200,301);
+        this.ranX = Phaser.Math.Between(270,301);
+        this.launchHoming = Phaser.Math.Between(250,301);
         this.ranBomberArrIndex = Phaser.Math.Between(0,4);
         
         if((this.ranX == 300) ){
@@ -254,43 +260,43 @@ class Monster extends Phaser.Scene{
         
         if((this.homingState == false) ){
            
-            if(this.my.sprite.homingArr.length >9){
+            if((this.my.sprite.homingArr.length >9) &&( this.my.sprite.enemyHoming.active== true)){
             this.my.sprite.enemyHoming.x = this.my.sprite.enemyPlane.x -30;
             this.my.sprite.enemyHoming.y = this.my.sprite.enemyPlane.y;
             }
-            if(this.my.sprite.homingArr.length >8){
+            if((this.my.sprite.homingArr.length >8) &&( this.my.sprite.enemyHoming1.active== true)){
             this.my.sprite.enemyHoming1.x = this.my.sprite.enemyPlane.x -70;
             this.my.sprite.enemyHoming1.y = this.my.sprite.enemyPlane.y;
             }
-            if(this.my.sprite.homingArr.length >7){
+            if((this.my.sprite.homingArr.length >7) &&( this.my.sprite.enemyHoming2.active== true)){
             this.my.sprite.enemyHoming2.x = this.my.sprite.enemyPlane.x +40;
             this.my.sprite.enemyHoming2.y = this.my.sprite.enemyPlane.y;
             }
-            if(this.my.sprite.homingArr.length >6){
+            if((this.my.sprite.homingArr.length >6) &&( this.my.sprite.enemyHoming3.active== true)){
             this.my.sprite.enemyHoming3.x = this.my.sprite.enemyPlane.x +70;
             this.my.sprite.enemyHoming3.y = this.my.sprite.enemyPlane.y;
             }
-            if(this.my.sprite.homingArr.length >5){
+            if((this.my.sprite.homingArr.length >5) &&( this.my.sprite.enemyHoming4.active== true)){
             this.my.sprite.enemyHoming4.x = this.my.sprite.enemyPlane.x -70;
             this.my.sprite.enemyHoming4.y = this.my.sprite.enemyPlane.y+40;
             }
-            if(this.my.sprite.homingArr.length >4){
+            if((this.my.sprite.homingArr.length >4) &&( this.my.sprite.enemyHoming5.active== true)){
             this.my.sprite.enemyHoming5.x = this.my.sprite.enemyPlane.x;
             this.my.sprite.enemyHoming5.y = this.my.sprite.enemyPlane.y+40;
             }
-            if(this.my.sprite.homingArr.length >3){
+            if((this.my.sprite.homingArr.length >3) &&( this.my.sprite.enemyHoming6.active== true)){
             this.my.sprite.enemyHoming6.x = this.my.sprite.enemyPlane.x +70;
             this.my.sprite.enemyHoming6.y = this.my.sprite.enemyPlane.y+40;
             }
-            if(this.my.sprite.homingArr.length >2){
+            if((this.my.sprite.homingArr.length >2) &&( this.my.sprite.enemyHoming7.active== true)){
             this.my.sprite.enemyHoming7.x = this.my.sprite.enemyPlane.x -40;
             this.my.sprite.enemyHoming7.y = this.my.sprite.enemyPlane.y+80;
             }
-            if(this.my.sprite.homingArr.length >1){
+            if((this.my.sprite.homingArr.length >1) &&( this.my.sprite.enemyHoming8.active== true)){
             this.my.sprite.enemyHoming8.x = this.my.sprite.enemyPlane.x;
             this.my.sprite.enemyHoming8.y = this.my.sprite.enemyPlane.y+80;
             }
-            if(this.my.sprite.homingArr.length >0){
+            if((this.my.sprite.homingArr.length >0) &&( this.my.sprite.enemyHoming9.active== true)){
             this.my.sprite.enemyHoming9.x = this.my.sprite.enemyPlane.x +40;
             this.my.sprite.enemyHoming9.y = this.my.sprite.enemyPlane.y+80;
             }
@@ -307,7 +313,7 @@ class Monster extends Phaser.Scene{
                 from: 0,
                 to: 1,
                 delay: 0,
-                duration: 5000,
+                duration: 3000,
                 ease: 'Linear',
                 repeat: 0,
                 yoyo: false,
@@ -319,8 +325,7 @@ class Monster extends Phaser.Scene{
              this.homingState = false;  
         }
         if(this.currHoming){
-            console.log(this.currHoming.displayWidth);
-            console.log("Damage cooldown counter: "+this.damageCooldownCounter);
+            console.log("Homing cooldown counter: "+this.homingCooldownCounter);
             if(this.collides(this.currHoming,this.my.sprite.plane) && (this.damageCooldownCounter < 0)){
                 this.damageReceived();
                 this.damageCooldownCounter =  this.damageCooldown;
@@ -359,24 +364,25 @@ class Monster extends Phaser.Scene{
             elements.y -= 25;
             for(let homer of this.my.sprite.homingArr){
                 if(this.collides(elements,homer)){
-                    homer.destroy();
+                    this.collidedBullet = elements;
+                    homer.x = 900;
+                    elements.x = 900;
                     this.playerScore += 50;
                 }
-                if(homer.x >700){
-        
-                    homer.visible = false
+                if((homer.x >700)&&(elements.x >700)){
+                    homer.visible = false;
+                    homer.active = false;
+                    elements.destroy();
                 }
             }
             for(let bombers of this.my.sprite.bomberArr){
                 if(this.collides(elements,bombers)){
-                    bombers.x = 900;
                     bombers.destroy();
+                    bombers.x = 900;
                     this.playerScore += 50;
                 }
             }
-            if(this.collides(elements,this.my.sprite.enemyHoming)){
-                this.my.sprite.enemyHoming.visible = false;
-            }
+            
        }
 
        
@@ -398,12 +404,7 @@ class Monster extends Phaser.Scene{
             }
        }
 
-       for(let elements of this.my.sprite.homingArr){
-            if(this.collides(elements,this.my.sprite.plane) && (this.damageCooldownCounter < 0)){
-                this.damageReceived();
-                this.damageCooldownCounter =  this.damageCooldown;
-            }
-        }
+       
 
         
 
@@ -421,17 +422,16 @@ class Monster extends Phaser.Scene{
     collides(a, b) {
         if (Math.abs(a.x - b.x) > (a.displayWidth/2 + b.displayWidth/2)) return false;
         if (Math.abs(a.y - b.y) > (a.displayHeight/2 + b.displayHeight/2)) return false;
-        /*for(let elements of enemyArr){
-            if(elements.visible == true){
-
-            }
-        }*/
+        
         return true;
     }
 
     damageReceived(){
         if(this.my.sprite.reinforcements[0]){
             this.my.sprite.reinforcements.pop().visible = false;
+            this.sound.play("explode",{
+                volume: 1
+            });
         }else{
             this.scene.start("ending");
         }
