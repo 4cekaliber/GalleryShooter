@@ -379,7 +379,7 @@ class Monster extends Phaser.Scene{
                 if(this.collides(elements,bombers)){
                     bombers.destroy();
                     bombers.x = 900;
-                    this.playerScore += 50;
+                    this.playerScore += 75;
                 }
             }
             
